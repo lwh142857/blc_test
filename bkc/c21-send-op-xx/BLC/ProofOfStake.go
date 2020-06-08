@@ -5,6 +5,8 @@ import(
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"Accounts"
+	"block"
 )
 //POS生成区块
 
@@ -24,6 +26,7 @@ func NewProofOfStake(block *Block) *ProofOfStake{
 	return &ProofOfStake{block,target}
 }
 
+//执行函数
 func (ProofOfStake *ProofOfStake) Run() ([]byte,int){
 	var nonce=0
 	var hashInt big.Int
@@ -38,14 +41,14 @@ func (ProofOfStake *ProofOfStake) Run() ([]byte,int){
 
 //随机得出挖矿地址（挖矿概率跟代币数量与币龄有关）
 func getMineNodeAddress() string {
-	bInt := big.NewInt(int64(len(Node.P_Nodespool)))
+	bInt := big.NewInt(int64(len(P_AccountsPool)))
 	//得出一个随机数，最大不超过随机节点池的大小
 	rInt, err := rand.Int(rand.Reader, bInt)
 	if err != nil {
 		log.Panic(err)
 	}
-	Node.P_Nodespool(rInt.Int64()).Account.days = 0
-	return Node.P_Nodespool[int(rInt.Int64())].address
+	P_AccountsPool(rInt.Int64()).Account.days = 0
+	return P_AccountsPool[int(rInt.Int64())].address
 }
 
 	//拼接区块属性，进行哈希计算
@@ -62,4 +65,17 @@ func (pos *ProofOfStake)prepareData(nonce int64) []byte{
 		IntToHex(nonce),
 	},[]byte{})
 	return data
+}
+
+
+//初始化
+func Pos_init() {	
+	AccountsPool = append(AccountsPool，AddNewAccount('1'，3200))
+	AccountsPool = append(AccountsPool，AddNewAccount('2'，6400))
+	//初始化随机节点池（挖矿概率与代币数量和币龄有关）
+	for _, v := range AccountsPool {
+		for i := 0; i <= v.Balance*v.Days; i++ {
+			P_AccountsPool = append(P_AccountsPool, v)
+		}
+	}
 }
