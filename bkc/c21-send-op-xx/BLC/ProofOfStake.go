@@ -20,26 +20,33 @@ type ProofOfStake struct {
 func NewProofOfStake(block *Block) *ProofOfStake{
 	//1.创建一个初始值为1的target
 	target :=big.NewInt(1)
-	//难度 2，假设哈希是8位
-	//0000 0001
-	//8-2=6
-	//0100 0000 64 左移6位，生成的哈希只要小于64就可以了
-
-	//2.左移256-targetBit
 	target = target.Lsh(target,256-targetBit)
 	return &ProofOfStake{block,target}
 }
 
 func (ProofOfStake *ProofOfStake) Run() ([]byte,int){
-	//碰撞次数
 	var nonce=0
 	var hashInt big.Int
-	var hash [32]byte //生成的哈希值,在外面先进行定义一下，从而当返回的时候，可以写return hash，具有可见性
-	//无限循环，生成符合条件的哈希值
-
+	var hash [32]byte 
+	dataBytes := proofOfWork.prepareData(int64(nonce))
+	//生成hash
+	hash = sha256.Sum256(dataBytes)  //sha256.Sum256返回的是[]byte
+	//将hash存储到hashInt
+	hashInt.SetBytes(hash[:]) 
 	return hash[:],nonce
 }
 
+//随机得出挖矿地址（挖矿概率跟代币数量与币龄有关）
+func getMineNodeAddress() string {
+	bInt := big.NewInt(int64(len(Node.P_Nodespool)))
+	//得出一个随机数，最大不超过随机节点池的大小
+	rInt, err := rand.Int(rand.Reader, bInt)
+	if err != nil {
+		log.Panic(err)
+	}
+	Node.P_Nodespool(rInt.Int64()).Account.days = 0
+	return Node.P_Nodespool[int(rInt.Int64())].address
+}
 
 	//拼接区块属性，进行哈希计算
 func (pos *ProofOfStake)prepareData(nonce int64) []byte{
