@@ -27,11 +27,11 @@ func Increasecoinage()  {
 		}
 }
 //添加账户
-func AddNewNode(name string，balance float32)Node{
+func AddNewAccount(name string，balance float32)Account{
 	account := Account{
 		Name:name,
 		Balance:balance,
-		Address:strconv.Itoa("name" + strconv.Itoa(balance)),
+		Address:strconv.Itoa(name + strconv.Itoa(balance)),
 		Days:0,
 	}
 	return account
