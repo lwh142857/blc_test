@@ -15,6 +15,8 @@ type Account struct{
 }
 var AccountsPool[] Account   //账户池
 var P_AccountsPool[] Account  //概率账户池
+var V_AccountsPool[] Account //竞选节点池
+var S_AccountsPool[] Account   //超级节点
 
 //币龄随时间增加
 func Increasecoinage()  {

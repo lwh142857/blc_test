@@ -5,8 +5,7 @@ import(
 	"bytes"
 	"crypto/sha256"
 	"fmt"
-	"Accounts"
-	"block"
+
 )
 //POS生成区块
 

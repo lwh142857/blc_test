@@ -53,6 +53,8 @@ func PrintUsage(){
 	fmt.Printf("\t\t--from FROM --转账原地址\n")
 	fmt.Printf("\t\t--to TO --转账目的地址\n")
 	fmt.Printf("\t\t--amount AMOUNT --转账金额\n")
+	//打印账户
+	fmt.Printf("\tprintaccounts -- 打印全部账户信息\n")
 	//查询余额
 	fmt.Printf("\tgetbalance --address FROM --查询指定地址的余额\n")
 	fmt.Printf("\t转账参数说明\n")
@@ -94,7 +96,8 @@ func (cli *CLI) Run(){
 	sendCmd := flag.NewFlagSet("send",flag.ExitOnError)
 	//查询余额的命令
 	getBalanceCmd := flag.NewFlagSet("getbalance",flag.ExitOnError)
-
+	//打印全部区块信息
+	printAccountsCmd := flag.NewFlagSet("printaccounts",flag.ExitOnError)
 	//数据参数
 	//添加区块 比如*flagAddBlockArg，就是输入的命令行中，data命令后输入的字符串数据具体是什么
 	flagAddBlockArg := addBlockCmd.String("data","send 100btc to player","添加区块数据")
@@ -106,7 +109,8 @@ func (cli *CLI) Run(){
 	flagSendAmountArg := sendCmd.String("amount","","转账金额")
 	//查询余额命令行参数
 	flagGetBalanceArg :=getBalanceCmd.String("address","","要查询的地址")
-
+	//打印账户信息命令参数
+	//flagprintAccountsArg :=printAccountsCmd.String("address","","要查询的地址")
 	//判断命令
 	switch os.Args[1] {
 	case "getbalance":
@@ -129,6 +133,10 @@ func (cli *CLI) Run(){
 	case "createblockchain":
 		if err:=createBLCWithGenesisBlockCmd.Parse(os.Args[2:]);err!=nil{
 			log.Panicf("parse createBLCWithGenesisBlockCmd failed! %v\n",err)
+		}
+	case "printaccounts":
+		if err:=printAccountsCmd.Parse(os.Args[2:]);err!=nil{
+			log.Panicf("parse printAccountsCmd failed! %v\n",err)
 		}
 	default:
 		//没有传递任何命令或者传递的命令不在上面的命令列表中
@@ -186,6 +194,10 @@ func (cli *CLI) Run(){
 	//输出区块信息
 	if printChainCmd.Parsed(){
 		cli.printchain()
+	}
+	//打印账户信息
+	if printAccountsCmd.Parsed(){
+		cli.printaccounts()
 	}
 	//创建区块链命令
 	if createBLCWithGenesisBlockCmd.Parsed(){
