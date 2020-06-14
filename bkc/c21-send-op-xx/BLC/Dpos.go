@@ -1,31 +1,34 @@
 package BLC
 
-import(
-	"math/big"
+import (
 	"bytes"
+	"crypto/rand"
 	"crypto/sha256"
-	"fmt"
+	"log"
+	"math/big"
+	"sort"
+	//	"fmt"
 )
 
 const (
-	voteNodeNum      = 100  //投票节点
-	superNodeNum     = 10   //超级节点
-	mineSuperNodeNum = 3   
+	voteNodeNum      = 100 //投票节点
+	superNodeNum     = 10  //超级节点
+	mineSuperNodeNum = 3
 )
 
 type Dpos struct {
 	//需要共识的区块
 	Block *Block
 	//目标难度的哈希
-	target *big.Int  //大数据存储
+	target *big.Int //大数据存储
 }
 
 //创建一个POS对象
-func NewDPos(block *Block) *Dpos{
+func NewDPos(block *Block) *Dpos {
 	//1.创建一个初始值为1的target
-	target :=big.NewInt(1)
-	target = target.Lsh(target,256-targetBit)
-	return &Dpos{block,target}
+	target := big.NewInt(1)
+	target = target.Lsh(target, 256-targetBit)
+	return &Dpos{block, target}
 }
 
 //投票
@@ -44,25 +47,24 @@ func sortMineNodes() {
 	sort.Slice(V_AccountsPool, func(i, j int) bool {
 		return V_AccountsPool[i].Balance > V_AccountsPool[j].Balance
 	})
-	S_NodesPool = V_AccountsPool[:mineSuperNodeNum]
+	S_AccountsPool = V_AccountsPool[:mineSuperNodeNum]
 }
 
-
 //执行函数
-func (Dpos *Dpos) Run() ([]byte,int){
-	var nonce=0
+func (Dpos *Dpos) Run() ([]byte, int) {
+	var nonce = 0
 	var hashInt big.Int
-	var hash [32]byte 
-	dataBytes := proofOfWork.prepareData(int64(nonce))
+	var hash [32]byte
+	dataBytes := Dpos.prepareData(int64(nonce))
 	//生成hash
-	hash = sha256.Sum256(dataBytes)  //sha256.Sum256返回的是[]byte
+	hash = sha256.Sum256(dataBytes) //sha256.Sum256返回的是[]byte
 	//将hash存储到hashInt
-	hashInt.SetBytes(hash[:]) 
-	return hash[:],nonce
+	hashInt.SetBytes(hash[:])
+	return hash[:], nonce
 }
 
 //拼接区块属性，进行哈希计算
-func (dpos *Dpos)prepareData(nonce int64) []byte{
+func (dpos *Dpos) prepareData(nonce int64) []byte {
 
 	timeStampBytes := IntToHex(dpos.Block.TimeStamp)
 	heightBytes := IntToHex(dpos.Block.Heigth)
@@ -73,6 +75,6 @@ func (dpos *Dpos)prepareData(nonce int64) []byte{
 		dpos.Block.HashTransaction(),
 		IntToHex(targetBit),
 		IntToHex(nonce),
-	},[]byte{})
+	}, []byte{})
 	return data
 }
