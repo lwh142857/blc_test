@@ -40,6 +40,7 @@ func NewBlock(height int64, prevBlockHash []byte, txs []*Transaction) *Block {
 		Mineraddress:  nil,
 		Nonce:         0,
 	}
+	var j = 0
 	//选择共识算法
 	switch mod {
 	case "pow":
@@ -57,6 +58,8 @@ func NewBlock(height int64, prevBlockHash []byte, txs []*Transaction) *Block {
 		//dpos
 		dpos := NewDPos(&block)
 		block.Hash = dpos.Run()
+		block.Mineraddress = S_AccountsPool[j].Address
+		j = j % len(S_AccountsPool)
 	}
 	return &block
 }

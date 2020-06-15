@@ -37,8 +37,10 @@ func (ProofOfStake *ProofOfStake) Run() []byte {
 	hash = sha256.Sum256(dataBytes) //sha256.Sum256返回的是[]byte
 	//将hash存储到hashInt
 	hashInt.SetBytes(hash[:])
-
+	//获取miner地址
+	Pos_init()
 	ProofOfStake.Block.Mineraddress = getMineNodeAddress()
+
 	return hash[:]
 }
 
