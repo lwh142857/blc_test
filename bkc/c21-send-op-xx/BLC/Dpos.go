@@ -51,7 +51,7 @@ func sortMineNodes() {
 }
 
 //执行函数
-func (Dpos *Dpos) Run() ([]byte, int) {
+func (Dpos *Dpos) Run() []byte {
 	var nonce = 0
 	var hashInt big.Int
 	var hash [32]byte
@@ -60,7 +60,11 @@ func (Dpos *Dpos) Run() ([]byte, int) {
 	hash = sha256.Sum256(dataBytes) //sha256.Sum256返回的是[]byte
 	//将hash存储到hashInt
 	hashInt.SetBytes(hash[:])
-	return hash[:], nonce
+	//竞选+排序
+	voting()
+	sortMineNodes()
+
+	return hash[:]
 }
 
 //拼接区块属性，进行哈希计算

@@ -28,7 +28,7 @@ func NewProofOfStake(block *Block) *ProofOfStake {
 }
 
 //执行函数
-func (ProofOfStake *ProofOfStake) Run() ([]byte, int) {
+func (ProofOfStake *ProofOfStake) Run() []byte {
 	var nonce = 0
 	var hashInt big.Int
 	var hash [32]byte
@@ -37,7 +37,9 @@ func (ProofOfStake *ProofOfStake) Run() ([]byte, int) {
 	hash = sha256.Sum256(dataBytes) //sha256.Sum256返回的是[]byte
 	//将hash存储到hashInt
 	hashInt.SetBytes(hash[:])
-	return hash[:], nonce
+
+	ProofOfStake.Block.Mineraddress = getMineNodeAddress()
+	return hash[:]
 }
 
 //随机得出挖矿地址（挖矿概率跟代币数量与币龄有关）
