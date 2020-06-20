@@ -21,7 +21,7 @@ type Block struct {
 	TimeStamp     int64          //区块时间戳、代表区块时间
 	Hash          []byte         //当前区块哈希
 	PrevBlockHash []byte         //前区块哈希
-	Heigth        int64          //区块高度
+	Height        int64          //区块高度
 	Txs           []*Transaction //交易数据（交易列表）
 	Nonce         int64          //在运行pow时生成的哈希变化值，也代表pow运行时动态修改的数据
 	Mineraddress  string         //挖块的矿工地址
@@ -29,13 +29,13 @@ type Block struct {
 
 //构建区块
 //创建新块时，时间戳在创建的时候生成，不同参数传递
-//区块的哈希值需要经过pow共识算法的运算，计算出来，也不用外面进行参数传递
+//区块的哈希值需要经过共识算法的运算，计算出来，也不用外面进行参数传递
 func NewBlock(height int64, prevBlockHash []byte, txs []*Transaction) *Block {
 	block := Block{
 		TimeStamp:     time.Now().Unix(),
 		Hash:          nil,
 		PrevBlockHash: prevBlockHash,
-		Heigth:        height,
+		Height:        height,
 		Txs:           txs,
 		Mineraddress:  nil,
 		Nonce:         0,
@@ -51,16 +51,21 @@ func NewBlock(height int64, prevBlockHash []byte, txs []*Transaction) *Block {
 		block.Hash = hash
 		block.Nonce = int64(nonce)
 	case "pos":
-		//pos
+		//pos共识方法
 		pos := NewProofOfStake(&block)
 		block.Hash = pos.Run()
 	case "dpos":
-		//dpos
+		//dpos共识
 		dpos := NewDPos(&block)
 		block.Hash = dpos.Run()
 		block.Mineraddress = S_AccountsPool[j].Address
 		j = j % len(S_AccountsPool)
 	}
+	//币龄增加
+	Increasecoinage()
+	//挖矿奖励
+	MiningReward(block.Mineraddress)
+
 	return &block
 }
 

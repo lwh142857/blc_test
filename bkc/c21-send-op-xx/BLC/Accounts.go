@@ -1,12 +1,5 @@
 package BLC
 
-import (
-	//	"fmt"
-	//	"crypto/sha256"
-	//	"strconv"
-	"time"
-)
-
 type Account struct {
 	Name    string
 	Balance int
@@ -21,13 +14,10 @@ var S_AccountsPool []Account //超级节点
 
 //币龄随时间增加
 func Increasecoinage() {
-	t := time.NewTicker(3 * time.Second)
-	for {
-		<-t.C
-		for _, v := range AccountsPool {
-			v.Days++
-		}
+	for _, v := range AccountsPool {
+		v.Days++
 	}
+
 }
 
 //添加账户
@@ -39,4 +29,14 @@ func AddNewAccount(name string, balance int) Account {
 		Days:    0,
 	}
 	return account
+}
+
+//挖矿成功奖励
+func MiningReward(address string) {
+	for _, v := range AccountsPool {
+		if v.Address == address {
+			v.Balance += miningreward
+			v.Days = 0
+		}
+	}
 }
