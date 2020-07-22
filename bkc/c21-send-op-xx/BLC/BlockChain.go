@@ -24,6 +24,12 @@ type BlockChain struct {
 
 }
 
+//账户结构
+type AccountData struct {
+	DB  *bolt.DB //数据库对象
+	Num []byte
+}
+
 //判断数据库文件是否存在
 func dbExit() bool {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
@@ -52,6 +58,7 @@ func CreateBlockChainWithGenesisBlock(address string) *BlockChain {
 	//2.创建桶,把生成的创世区块存入数据库中
 	db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockTableName))
+		//区块链表
 		if b == nil {
 			//没找到桶
 			b, err := tx.CreateBucket([]byte(blockTableName))
@@ -77,12 +84,35 @@ func CreateBlockChainWithGenesisBlock(address string) *BlockChain {
 				log.Panicf("save the hash of genesis block failed %v\n", err)
 			}
 		}
+
 		if b != nil {
 			blockHash = b.Get([]byte("1"))
 		}
 		return nil
 	})
 	return &BlockChain{db, blockHash}
+}
+
+//添加账户到表中
+func (bc *AccountData) AddAccount(name string, balance int) {
+	//更新区块数据（insert）
+	bc.DB.Update(func(tx *bolt.Tx) error {
+		//1.获取数据库桶
+		b := tx.Bucket([]byte(accountsTableName))
+		if b != nil {
+			fmt.Printf("latest hash: %v\n", b.Get([]byte("1")))
+			//1.新建
+			newaccount := NewAccount(name, balance)
+			fmt.Printf("the hash of the account %x\n", newaccount.Hash)
+			//2.存入数据库
+			err := b.Put(newaccount.Hash, newaccount.Serialize())
+			if err != nil {
+				log.Panicf("insert the new account to db failed %v", err)
+			}
+			//更新最新区块的哈希（数据库中的）
+		}
+		return nil
+	})
 }
 
 //添加区块到区块链中

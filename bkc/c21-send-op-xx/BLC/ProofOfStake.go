@@ -60,7 +60,7 @@ func getMineNodeAddress() string {
 func (pos *ProofOfStake) prepareData(nonce int64) []byte {
 
 	timeStampBytes := IntToHex(pos.Block.TimeStamp)
-	heightBytes := IntToHex(pos.Block.Heigth)
+	heightBytes := IntToHex(pos.Block.Height)
 	data := bytes.Join([][]byte{
 		heightBytes,
 		timeStampBytes,
@@ -74,8 +74,8 @@ func (pos *ProofOfStake) prepareData(nonce int64) []byte {
 
 //初始化
 func Pos_init() {
-	AccountsPool = append(AccountsPool, AddNewAccount("1", 3200))
-	AccountsPool = append(AccountsPool, AddNewAccount("2", 6400))
+	AccountsPool = append(AccountsPool, NewAccount("1", 3200))
+	AccountsPool = append(AccountsPool, NewAccount("2", 6400))
 	//初始化随机节点池（挖矿概率与代币数量和币龄有关）
 	for _, v := range AccountsPool {
 		for i := 0; i <= v.Balance*v.Days; i++ {
